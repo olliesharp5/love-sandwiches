@@ -83,9 +83,18 @@ def calculate_surplus_data(sales_row):
     print("Calculating surplus data...\n")
     #obtains values in the stock sheet using gspread methods worksheet() and get_all_values()
     stock = SHEET.worksheet("stock").get_all_values()
-    #variable to obtain the last row in the stock data, uses slice method [-1 ] to always obtian the final row in the sheet
-    stock_row = stock[-1]
-    print(stock_row)
+    #variable to obtain the last row in the stock data, uses slice method [-1 ] to always obtian the final row in the sheet, also it converts the values to integers
+    stock_row = [int(value) for value in stock[-1]] 
+    
+    #creating an empty list for the for loop below to go into 
+    surplus_data = []
+    #for loop using the "zip" method to loop through stock_row and sales_row at the same time
+    for stock, sales in zip(stock_row, sales_row):
+        #formula to calculate the surplus
+        surplus = stock - sales 
+        surplus_data.append(surplus)
+    
+    return surplus_data
 
 
 
@@ -97,7 +106,8 @@ def main():
     #list comprehention to convert string values into integers 
     sales_data = [int(num) for num in data]
     update_sales_worksheet(sales_data)
-    calculate_surplus_data(sales_data)
+    new_surplus_data = calculate_surplus_data(sales_data)
+    print(new_surplus_data)
 
 #prints an initial message before the data needs to be inputted by the user
 print("Welcome to Love Sandwiches Data Automation")
