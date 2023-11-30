@@ -33,6 +33,9 @@ def validate_data(values):
     or if there aren't exactly 6 values.
     """
     try: 
+        #list comprehention to change each value in our values list into an integer
+        [int(value) for value in values]
+        #checks if the length equals 6
         if len(values) != 6:
             raise ValueError(
                 f"Exactly 6 values required, you privided {len(values)}"
