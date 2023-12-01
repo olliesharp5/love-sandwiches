@@ -1,6 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
-#enables the use of pprint
+# enables the use of pprint
 from pprint import pprint
 
 SCOPE = [
@@ -34,7 +34,7 @@ def get_sales_data():
         if validate_data(sales_data):
             print("Data is valid!")
             break
-    
+
     return sales_data
 
 
@@ -55,8 +55,9 @@ def validate_data(values):
     except ValueError as e:
         print(f"Invalid data: {e}, please try again.\n")
         return False
-    #returns true if the value has passed the validator check 
-    return True 
+    # returns true if the value has passed the validator check
+    return True
+
 
 """
 def update_sales_worksheet(data):
@@ -87,7 +88,7 @@ def update_worksheet(data, worksheet):
     print(f"Updating {worksheet} worksheet...\n")
     worksheet_to_update = SHEET.worksheet(worksheet)
     worksheet_to_update.append_row(data)
-    print(f"{worksheet} worksheet updated successfully\n")    
+    print(f"{worksheet} worksheet updated successfully\n")
 
 
 def calculate_surplus_data(sales_row):
@@ -99,19 +100,19 @@ def calculate_surplus_data(sales_row):
     - Negative surplus indicates extra made when stock was sold out.
     """
     print("Calculating surplus data...\n")
-    #obtains values in the stock sheet using gspread methods worksheet() and get_all_values()
+    # obtains values in the stock sheet using gspread methods worksheet() and get_all_values()
     stock = SHEET.worksheet("stock").get_all_values()
-    #variable to obtain the last row in the stock data, uses slice method [-1 ] to always obtian the final row in the sheet, also it converts the values to integers
-    stock_row = [int(value) for value in stock[-1]] 
-    
-    #creating an empty list for the for loop below to go into 
+    # variable to obtain the last row in the stock data, uses slice method [-1 ] to always obtian the final row in the sheet, also it converts the values to integers
+    stock_row = [int(value) for value in stock[-1]]
+
+    # creating an empty list for the for loop below to go into
     surplus_data = []
-    #for loop using the "zip" method to loop through stock_row and sales_row at the same time
+    # for loop using the "zip" method to loop through stock_row and sales_row at the same time
     for stock, sales in zip(stock_row, sales_row):
-        #formula to calculate the surplus
-        surplus = stock - sales 
+        # formula to calculate the surplus
+        surplus = stock - sales
         surplus_data.append(surplus)
-    
+
     return surplus_data
 
 
@@ -124,25 +125,51 @@ def get_last_5_entries_sales():
     sales = SHEET.worksheet("sales")
 
     columns = []
+    #loop obtains all 6 columns 
     for ind in range(1, 7):
         column = sales.col_values(ind)
+        #slice method only obtains the last 5 values from each column
         columns.append(column[-5:])
 
     return columns
+
+
+def calculate_stock_data(data):
+    """
+    Calculate the average stock for each item type, adding 10%
+    """
+    print("Calculating stock data...\n")
+    new_stock_data = []
+
+    for column in data: 
+        #converting to integers
+        int_column = [int(num) for num in column]
+        #sum of the values divided by the length gives the average
+        average = sum(int_column) / len(int_column)
+        #adds the 10% by multiplying the average by 1.1
+        stock_num = average * 1.1
+        #append this calculated stock_num to the new_stock_data list outside the for loop
+        new_stock_data.append(round(stock_num))
+
+    return new_stock_data
 
 def main():
     """
     Run all program functions
     """
     data = get_sales_data()
-    #list comprehention to convert string values into integers 
+    # list comprehention to convert string values into integers
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, "sales")
     new_surplus_data = calculate_surplus_data(sales_data)
     update_worksheet(new_surplus_data, "surplus")
+    sales_columns = get_last_5_entries_sales()
+    stock_data = calculate_stock_data(sales_columns)
+    update_worksheet(stock_data, "stock")
 
-#prints an initial message before the data needs to be inputted by the user
+
+# prints an initial message before the data needs to be inputted by the user
 print("Welcome to Love Sandwiches Data Automation")
-#important to note you can’t call a function above where it is defined in the file
+# important to note you can’t call a function above where it is defined in the file
 main()
-sales_columns = get_last_5_entries_sales()
+
