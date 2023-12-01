@@ -1,7 +1,5 @@
 import gspread
 from google.oauth2.service_account import Credentials
-# enables the use of pprint
-from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -27,7 +25,7 @@ def get_sales_data():
         print("Data should be six numbers, separated by commas.")
         print("Example: 10,20,30,40,50,60\n")
 
-        data_str = input("Enter your data here: ")
+        data_str = input("Enter your data here:\n")
 
         sales_data = data_str.split(",")
 
@@ -125,10 +123,10 @@ def get_last_5_entries_sales():
     sales = SHEET.worksheet("sales")
 
     columns = []
-    #loop obtains all 6 columns 
+    # loop obtains all 6 columns
     for ind in range(1, 7):
         column = sales.col_values(ind)
-        #slice method only obtains the last 5 values from each column
+        # slice method only obtains the last 5 values from each column
         columns.append(column[-5:])
 
     return columns
@@ -141,17 +139,18 @@ def calculate_stock_data(data):
     print("Calculating stock data...\n")
     new_stock_data = []
 
-    for column in data: 
-        #converting to integers
+    for column in data:
+        # converting to integers
         int_column = [int(num) for num in column]
-        #sum of the values divided by the length gives the average
+        # sum of the values divided by the length gives the average
         average = sum(int_column) / len(int_column)
-        #adds the 10% by multiplying the average by 1.1
+        # adds the 10% by multiplying the average by 1.1
         stock_num = average * 1.1
-        #append this calculated stock_num to the new_stock_data list outside the for loop
+        # append this calculated stock_num to the new_stock_data list outside the for loop
         new_stock_data.append(round(stock_num))
 
     return new_stock_data
+
 
 def main():
     """
@@ -172,4 +171,3 @@ def main():
 print("Welcome to Love Sandwiches Data Automation")
 # important to note you can’t call a function above where it is defined in the file
 main()
-
